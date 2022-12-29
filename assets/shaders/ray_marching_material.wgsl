@@ -1,5 +1,8 @@
 struct Camera {
-    position: vec4<f32>,
+    position: vec3<f32>,
+    forward: vec3<f32>,
+    horizontal: vec3<f32>,
+    vertical: vec3<f32>,
     aspect_ratio: f32,
 };
 
@@ -87,7 +90,7 @@ fn ray_march(ray_origin: vec3<f32>, ray_direction: vec3<f32>) -> vec3<f32> {
         if(distance_to_closest < MINIMUM_HIT_DISTANCE) {
             var normal = calculate_normal(current_position);
 
-            var light_position = vec3<f32>(2.0, -5.0, 3.0);
+            var light_position = vec3<f32>(2.0, -5.0, -3.0);
 
             var direction_to_light = normalize(current_position - light_position);
 
@@ -110,8 +113,8 @@ fn ray_march(ray_origin: vec3<f32>, ray_direction: vec3<f32>) -> vec3<f32> {
 
 @fragment
 fn fragment(in: FragmentIn) -> @location(0) vec4<f32> {
-    var camera_origin = camera.position.xyz;
-    var ray_origin = camera_origin + vec3<f32>(in.uv_coords, 1.0);
+    var camera_origin = camera.position;
+    var ray_origin = camera_origin + camera.forward * 1.0 + (in.uv_coords.x * camera.horizontal) + (in.uv_coords.y * camera.vertical);
     var ray_direction = normalize(ray_origin - camera_origin);
 
     var color = ray_march(ray_origin, ray_direction);
